@@ -1,0 +1,20 @@
+﻿"Phrases"
+{
+	"Welcome menu title"
+	{
+		"#format"	"{1:N}"
+		"en"			"Hi {1}, \n Welcome My Serve. \n \n Server Rules & Conditions."
+		"pt"			"Ola {1}, \n Bem vindo ão meu server. \n \n Regras do Servidor & Comandos."
+	}
+	"ShowMenu menu title"
+	{
+		"#format"	"{1:N}"
+		"en"			"Hi {1}, \n Serve Name. \n \n Send rules to:"
+		"pt"			"Ola {1}, \n Nome servidor. \n \n Enviar regras para:"
+	}
+	"Menu out message title"
+	{
+		"en"			"Exit {1}, \n Serve Name. \n \n I hope you like our Server."
+		"pt"			"Sair, \n Nome servidor. \n \n Espero que goste do nosso Servidor."
+	}
+}
