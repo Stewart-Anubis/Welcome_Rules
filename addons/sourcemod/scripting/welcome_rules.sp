@@ -129,7 +129,7 @@ public Action WelcomeMenuSpawn(Handle timer, any client)
 
 	if (b_CvarShowAdminRules)
 	{
-		if (!g_bRemember[client] && GetClientTeam(client) != 0 && IsPlayerAlive(client) && IsClientInGame(client))
+		if (!g_bRemember[client] && IsClientInGame(client) && GetClientTeam(client) != 0 && IsPlayerAlive(client) && !IsFakeClient(client))
 		{
 			CreateWelcomeMenu(client);
 		}
@@ -139,7 +139,7 @@ public Action WelcomeMenuSpawn(Handle timer, any client)
 		AdminId admin = GetUserAdmin(client);
 		if (!GetAdminFlag(admin, Admin_Kick))
 		{
-			if (!g_bRemember[client] && GetClientTeam(client) != 0 && IsPlayerAlive(client) && IsClientInGame(client))
+			if (!g_bRemember[client] && IsClientInGame(client) && GetClientTeam(client) != 0 && IsPlayerAlive(client) && !IsFakeClient(client))
 			{
 				CreateWelcomeMenu(client);
 			}
@@ -175,8 +175,11 @@ public Action CreateWelcomeMenu(int client)
 	SetGlobalTransTarget(client);
 	ClienCommand[client] = true;
 
-	SendConVarValue(client, mp_maxmoney, "0");
-	SendConVarValue(client, sv_disable_radar, "1");
+	if (IsClientInGame(client) && IsPlayerAlive(client))
+	{
+		SendConVarValue(client, mp_maxmoney, "0");
+		SendConVarValue(client, sv_disable_radar, "1");
+	}
 
 	char m_title[255], ItemNumber[64], ItemName[255];
 	char sCountryTag[3], sIP[26], name[26];
@@ -221,11 +224,14 @@ public int WelcomeMenuHandler(Menu menu, MenuAction action, int param1, int para
 	{
 		if (ClienCommand[param1])
 		{
-			SendConVarValue(param1, mp_maxmoney, "12000");
-			SendConVarValue(param1, sv_disable_radar, "0");
-			FakeClientCommand(param1, "say !guns");
-			//g_bRemember[param1] = true;
-			MenuOut(param1);
+			if (IsClientInGame(param1) && IsPlayerAlive(param1))
+			{
+				SendConVarValue(param1, mp_maxmoney, "12000");
+				SendConVarValue(param1, sv_disable_radar, "0");
+				FakeClientCommand(param1, "say !guns");
+				//g_bRemember[param1] = true;
+				MenuOut(param1);
+			}
 		}
 	}
 	else if (action == MenuAction_Select)
@@ -362,8 +368,11 @@ public int ItemMenuHandler(Menu menuitem, MenuAction action, int param1, int par
 
 public Action MenuOut(int client)
 {
-	SendConVarValue(client, mp_maxmoney, "0");
-	SendConVarValue(client, sv_disable_radar, "1");
+	if (IsClientInGame(client) && IsPlayerAlive(client))
+	{
+		SendConVarValue(client, mp_maxmoney, "0");
+		SendConVarValue(client, sv_disable_radar, "1");
+	}
 
 	Menu mMenuOut = new Menu(MenuOutHandler);
 
@@ -391,17 +400,23 @@ public int MenuOutHandler(Menu menuout, MenuAction action, int param1, int param
 	}
 	else if (action == MenuAction_Cancel)
 	{
-		SendConVarValue(param1, mp_maxmoney, "12000");
-		SendConVarValue(param1, sv_disable_radar, "0");
-		FakeClientCommand(param1, "say !guns");
-		//delete menuout;
+		if (IsClientInGame(param1) && IsPlayerAlive(param1))
+		{
+			SendConVarValue(param1, mp_maxmoney, "12000");
+			SendConVarValue(param1, sv_disable_radar, "0");
+			FakeClientCommand(param1, "say !guns");
+			//delete menuout;
+		}
 	}
 	else if (action == MenuAction_Select)
 	{
-		SendConVarValue(param1, mp_maxmoney, "12000");
-		SendConVarValue(param1, sv_disable_radar, "0");
-		FakeClientCommand(param1, "say !guns");
-		g_bRemember[param1] = true;
-		//delete menuout;
+		if (IsClientInGame(param1) && IsPlayerAlive(param1))
+		{
+			SendConVarValue(param1, mp_maxmoney, "12000");
+			SendConVarValue(param1, sv_disable_radar, "0");
+			FakeClientCommand(param1, "say !guns");
+			g_bRemember[param1] = true;
+			//delete menuout;
+		}
 	}
 }
