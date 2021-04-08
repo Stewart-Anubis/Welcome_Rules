@@ -40,7 +40,7 @@
 
 #pragma newdecls required
 
-#define VERSION "1.0-A"
+#define VERSION "1.0-B"
 
 ConVar g_CvarShowOnConnect;
 ConVar g_CvarShowOnConnectTimeout;
@@ -58,6 +58,8 @@ Handle sv_disable_radar = INVALID_HANDLE;
 Handle spawng_hTimer[MAXPLAYERS + 1] = INVALID_HANDLE;
 bool ClienCommand[MAXPLAYERS+1];
 bool g_bRemember[MAXPLAYERS + 1];
+char value_mp_maxmoney[10];
+char value_sv_disable_radar[10];
 
 char welcomepath[PLATFORM_MAX_PATH];
 
@@ -99,7 +101,9 @@ public void OnPluginStart()
 	f_CvarShowOnConnectDelay = g_CvarShowOnConnectDelay.FloatValue;
 
 	mp_maxmoney = FindConVar("mp_maxmoney");
+	GetConVarString(mp_maxmoney, value_mp_maxmoney, sizeof(value_mp_maxmoney));
 	sv_disable_radar = FindConVar("sv_disable_radar");
+	GetConVarString(sv_disable_radar, value_sv_disable_radar, sizeof(value_sv_disable_radar));
 
 	AutoExecConfig(true, "Welcome_Rules");
 }
@@ -226,8 +230,8 @@ public int WelcomeMenuHandler(Menu menu, MenuAction action, int param1, int para
 		{
 			if (IsClientInGame(param1) && IsPlayerAlive(param1))
 			{
-				SendConVarValue(param1, mp_maxmoney, "12000");
-				SendConVarValue(param1, sv_disable_radar, "0");
+				SendConVarValue(param1, mp_maxmoney, value_mp_maxmoney);
+				SendConVarValue(param1, sv_disable_radar, value_sv_disable_radar);
 				FakeClientCommand(param1, "say !guns");
 				//g_bRemember[param1] = true;
 				MenuOut(param1);
@@ -402,8 +406,8 @@ public int MenuOutHandler(Menu menuout, MenuAction action, int param1, int param
 	{
 		if (IsClientInGame(param1) && IsPlayerAlive(param1))
 		{
-			SendConVarValue(param1, mp_maxmoney, "12000");
-			SendConVarValue(param1, sv_disable_radar, "0");
+			SendConVarValue(param1, mp_maxmoney, value_mp_maxmoney);
+			SendConVarValue(param1, sv_disable_radar, value_sv_disable_radar);
 			FakeClientCommand(param1, "say !guns");
 			//delete menuout;
 		}
@@ -412,8 +416,8 @@ public int MenuOutHandler(Menu menuout, MenuAction action, int param1, int param
 	{
 		if (IsClientInGame(param1) && IsPlayerAlive(param1))
 		{
-			SendConVarValue(param1, mp_maxmoney, "12000");
-			SendConVarValue(param1, sv_disable_radar, "0");
+			SendConVarValue(param1, mp_maxmoney, value_mp_maxmoney);
+			SendConVarValue(param1, sv_disable_radar, value_sv_disable_radar);
 			FakeClientCommand(param1, "say !guns");
 			g_bRemember[param1] = true;
 			//delete menuout;
