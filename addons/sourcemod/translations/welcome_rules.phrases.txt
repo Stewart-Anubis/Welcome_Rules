@@ -12,9 +12,25 @@
 		"en"			"Hi {1}, \n Serve Name. \n \n Send rules to:"
 		"pt"			"Ola {1}, \n Nome servidor. \n \n Enviar regras para:"
 	}
-	"Menu out message title"
+	"To execute"
 	{
-		"en"			"Exit {1}, \n Serve Name. \n \n I hope you like our Server."
-		"pt"			"Sair, \n Nome servidor. \n \n Espero que goste do nosso Servidor."
+		"en"			"To Execute"
+		"pt"			"Executar"
+	}
+	"ShowMenu target"
+	{
+		"#format"	"{1:N}"
+		"en"			" {lightred}[{lightgreen}Welcome{lightred}]{default} Admin {lightgreen}{1} {default}sent you the rules/welcome menu."
+		"pt"			" {lightred}[{lightgreen}Welcome{lightred}]{default} O admin {lightgreen}{1} {default}enviou o menu regras/welcome para vocé."
+	}
+	"WelcomeMenu End"
+	{
+		"en"			" {lightred}[{lightgreen}Welcome{lightred}]{default} At any time you can type {lightred}!rules {default}or {lightred}!welcome{default}, to see the rules or get help on server commands. Good game!"
+		"pt"			" {lightred}[{lightgreen}Welcome{lightred}]{default} A qualquer momento voce pode digitar {lightred}!rules {default}ou {lightred}!welcome{default} ,para ver as regras ou ter ajuda sobre os comandos do servidor. Bom Jogo!"
+	}
+	"Welcome Menu"
+	{
+		"en"			" {lightred}[{lightgreen}Welcome{lightred}]{default} Welcome to the {lightred}Rules {default}and {lightgreen}Commands {default}menu."
+		"pt"			" {lightred}[{lightgreen}Welcome{lightred}]{default} Bem vindo ao menu de {lightred}Regras {default}e {lightgreen}Comandos{default}."
 	}
 }
