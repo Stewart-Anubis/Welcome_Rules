@@ -69,7 +69,8 @@ bool g_bCvarShowAdminRules = false,
 int g_iCvarShowOnConnectTimeout = 10,
 	g_iItemMenu[MAXPLAYERS + 1] = {0, ...},
 	g_iMenuBackKey[MAXPLAYERS + 1] = {0, ...},
-	g_iLastSelection[MAXPLAYERS + 1] = {-1, ...};
+	g_iLastSelection[MAXPLAYERS + 1] = {-1, ...},
+	g_iClientLanguage[MAXPLAYERS+1] = {0, ...};
 
 float g_fCvarShowOnConnectDelay = 2.1;
 
@@ -77,6 +78,7 @@ char g_sMenuTriggers[WELCOME_MAX_CMDS * WELCOME_MAX_LENGTH],
 	g_sCommandAfterClosing[LENGTH_MED_TEXT];
 
 KeyValues g_hkvWelcome[MAXPLAYERS + 1];
+StringMap g_smLanguageIndex;
 
 public Plugin myinfo =
 {
@@ -113,12 +115,16 @@ public void OnPluginStart()
 	g_cCvarShowAdminRules.AddChangeHook(OnConVarChanged);
 	g_cCvarShowOnConnectDelay.AddChangeHook(OnConVarChanged);
 	g_cCvarCommandAfterClosing.AddChangeHook(OnConVarChanged);
+	ReadConfig();
+
+	AddCommandListener(Button_F4, "rebuy");
 
 	for (int i = 1; i <= MaxClients; i++)
 	{
 		if(IsValidClient(i))
 		{
-			OnClientPutInServer(i);
+			//OnClientPutInServer(i);
+			OnClientPostAdminCheck(i);
 		}
 	}
 
@@ -150,6 +156,29 @@ public void OnConVarChanged(ConVar CVar, const char[] oldVal, const char[] newVa
 		g_cCvarCommandAfterClosing.GetString(g_sCommandAfterClosing ,sizeof(g_sCommandAfterClosing));
 	}
 }
+/*
+public void OnConfigsExecuted()
+{
+	ReadConfig();
+}
+*/
+public void ReadConfig()
+{
+	if(g_smLanguageIndex != null) delete g_smLanguageIndex;
+	g_smLanguageIndex = new StringMap();
+
+	int langCount = GetLanguageCount();
+	int langCounter = 0;
+	
+	for (int i = 0; i < langCount; i++)
+	{
+		char code[4];
+		char language[32];
+		GetLanguageInfo(i, code, sizeof(code), language, sizeof(language));
+		g_smLanguageIndex.SetValue(language, langCounter);
+		langCounter++;
+	}
+}
 
 void RegCmd()
 {
@@ -164,9 +193,46 @@ void RegCmd()
 	}
 }
 
+public void OnClientPostAdminCheck(int client)
+{
+	QueryClientConVar(client, "cl_language", ConVarCallBack);
+}
+
+public void ConVarCallBack(QueryCookie cookie, int client, ConVarQueryResult result, const char[] cvarName, const char[] cvarValue)
+{
+	if(IsValidClient(client))
+	{
+		if(!g_smLanguageIndex.GetValue(cvarValue, g_iClientLanguage[client]))
+		{
+			g_iClientLanguage[client] = 0;
+		}
+
+		char sClLang[3];
+		char sWelcomePath[PLATFORM_MAX_PATH];
+		GetLanguageInfo(g_iClientLanguage[client], sClLang, sizeof(sClLang));
+
+		BuildPath(Path_SM, sWelcomePath, sizeof(sWelcomePath), "configs/Welcome_Rules/Welcome_%s.cfg" ,sClLang);
+		if(!FileExists(sWelcomePath))
+		BuildPath(Path_SM, sWelcomePath, sizeof(sWelcomePath), "configs/Welcome_Rules/Welcome_us.cfg");
+
+		delete g_hkvWelcome[client];
+		g_hkvWelcome[client] = new KeyValues("Welcome");
+		FileToKeyValues(g_hkvWelcome[client], sWelcomePath);
+
+		if (g_fCvarShowOnConnectDelay > 1.0)
+		{
+			g_iItemMenu[client] = 0;
+			g_iMenuBackKey[client] = 0;
+			g_bRemember[client] = false;
+			CloseTimer(client);
+			g_hSpawng_hTimer[client] = CreateTimer(g_fCvarShowOnConnectDelay, WelcomeMenuSpawn, client);
+		}
+	}
+}
+/*
 public void OnClientPutInServer(int client)
 {
-	CreateTimer(1.0, OnClientPutInServerPost, client);
+	CreateTimer(3.0, OnClientPutInServerPost, client);
 }
 
 public Action OnClientPutInServerPost(Handle PutTimer, int client)
@@ -195,7 +261,7 @@ public Action OnClientPutInServerPost(Handle PutTimer, int client)
 		}
 	}
 }
-
+*/
 public void OnClientDisconnect(int client)
 {
 	if (client >= 1 && client < MaxClients && !IsFakeClient(client) && !IsClientSourceTV(client) && !IsClientReplay(client))
@@ -205,6 +271,7 @@ public void OnClientDisconnect(int client)
 		g_iItemMenu[client] = 0;
 		g_iMenuBackKey[client] = 0;
 		g_bRemember[client] = false;
+		g_iClientLanguage[client] = 0;
 		CloseTimer(client);
 	}
 }
@@ -233,6 +300,12 @@ public Action WelcomeMenuSpawn(Handle timer, any client)
 			}
 		}
 	}
+	return Plugin_Handled;
+}
+
+public Action Button_F4(int client, char[] command, int args)
+{
+	Command_Welcome(client,args);
 	return Plugin_Handled;
 }
 
